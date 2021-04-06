@@ -96,38 +96,45 @@ bool IndexValidity(int i, int j, int height, int width){
 // Blur image
 void blur(int height, int width, RGBTRIPLE image[height][width])
 {
-	int totalRed, totalGreen, totalBlue, nrOfValids = 0;
+	int totalRed, totalGreen, totalBlue;
+	float nrOfValids;
 	RGBTRIPLE blurImage[height][width];
-    for (int i = 0; i < height; i++)
+
+    for (int i = 0; i < width; i++)
     {
-        for (int j = 0; j < width; j++)
+        for (int j = 0; j < height; j++)
         {
-			totalRed = 0;
-			totalBlue = 0;
-			totalGreen = 0;
-			nrOfValids = 0;
-            // if valid location, add to total, incerement nr of totals
-            int loci, locj = 0;
+            totalRed = 0;
+            totalGreen = 0;
+            totalBlue = 0;
+            nrOfValids = 0.00;
+
+            // sums values of surrounding pixels if they are within bounds
             for (int k = -1; k < 2; k++)
             {
-                for (int l = -1; l < 2; l++)
+                if (j + k < 0 || j + k > height - 1)
                 {
-                    loci = i + k;
-                    locj = j + l;
-                    // bool valid = IndexValidity(loci, locj, height, width);
-					if ((loci < height) && (loci >=  0) && (locj < width) && (locj >= 0))
-                    // if (valiid == true)
+                    continue;
+                }
+
+                for (int h = -1; h < 2; h++)
+                {
+                    if (i + h < 0 || i + h > width - 1)
                     {
-                        totalRed = totalRed + image[loci][locj].rgbtRed;
-                        totalGreen = totalGreen + image[loci][locj].rgbtGreen;
-                        totalBlue = totalBlue + image[loci][locj].rgbtBlue;
-                        nrOfValids++;
+                        continue;
                     }
+
+                    totalRed += image[j + k][i + h].rgbtRed;
+                    totalGreen += image[j + k][i + h].rgbtGreen;
+                    totalBlue += image[j + k][i + h].rgbtBlue;
+                    nrOfValids++;
                 }
             }
-            blurImage[i][j].rgbtRed = limit_value(round(totalRed / nrOfValids), 255);
-            blurImage[i][j].rgbtBlue = limit_value(round(totalBlue / nrOfValids), 255);
-            blurImage[i][j].rgbtGreen = limit_value(round(totalGreen / nrOfValids), 255);
+
+            // averages the sum to make picture look blurrier
+            blurImage[j][i].rgbtRed = limit_value(round(totalRed / nrOfValids), 255);
+            blurImage[j][i].rgbtGreen = limit_value(round(totalGreen / nrOfValids), 255);
+            blurImage[j][i].rgbtBlue = limit_value(round(totalBlue / nrOfValids), 255);
         }
     }
 

@@ -114,8 +114,9 @@ void blur(int height, int width, RGBTRIPLE image[height][width])
                 {
                     loci = i + l;
                     locj = j + k;
-                    bool valid = IndexValidity(loci, locj, height, width);
-                    if (valid == true)
+                    // bool valid = IndexValidity(loci, locj, height, width);
+					if ((loci < height) && (loci >=  0) && (locj < width) && (locj >= 0))
+                    // if (valiid == true)
                     {
                         totalRed = totalRed + image[loci][locj].rgbtRed;
                         totalGreen = totalGreen + image[loci][locj].rgbtGreen;

@@ -112,8 +112,8 @@ void blur(int height, int width, RGBTRIPLE image[height][width])
             {
                 for (int l = -1; l < 2; l++)
                 {
-                    loci = i + l;
-                    locj = j + k;
+                    loci = i + k;
+                    locj = j + l;
                     // bool valid = IndexValidity(loci, locj, height, width);
 					if ((loci < height) && (loci >=  0) && (locj < width) && (locj >= 0))
                     // if (valiid == true)

@@ -6,28 +6,28 @@
 // Convert image to grayscale
 void grayscale(int height, int width, RGBTRIPLE image[height][width])
 {
-	int blue, green, red, avg;
-    for (int i = 0; i < height; i++)
+    float avg;
+    for (int i = 0; i < width; i++)
     {
-        for (int j = 0; j < width; j++)
+        for (int j = 0; j < height; j++)
         {
-            blue = image[i][j].rgbtBlue;
-            red = image[i][j].rgbtRed;
-            green = image[i][j].rgbtGreen;
-            avg = round((blue + red + green) / 3);
+            avg = round((image[j][i].rgbtBlue + image[j][i].rgbtRed + image[j][i].rgbtGreen) / 3.0);
 
-            image[i][j].rgbtBlue = avg;
-            image[i][j].rgbtRed = avg;
-            image[i][j].rgbtGreen = avg;
+            // apply average colour to each pixel
+            image[j][i].rgbtRed = avg;
+            image[j][i].rgbtGreen = avg;
+            image[j][i].rgbtBlue = avg;
         }
 
     }
-    return;
 }
 
-int limit_value(int input, int limit){
+// if rgb value exceeds 255, limit it to 255
+int limit_value(int input, int limit)
+{
     int value;
-    if(input > limit){
+    if (input > limit)
+    {
         value = limit;
     }
     else
@@ -44,9 +44,12 @@ void sepia(int height, int width, RGBTRIPLE image[height][width])
     {
         for (int j = 0; j < width; j++)
         {
+            // get color of pixel
             int blue = image[i][j].rgbtBlue;
             int red = image[i][j].rgbtRed;
             int green = image[i][j].rgbtGreen;
+
+            // apply sepia colouring to each pixel
             int sepiaRed = limit_value(round(0.393 * red + 0.769 * green + 0.189 * blue), 255);
             int sepiaGreen = limit_value(round(0.349 * red + 0.686 * green + 0.168 * blue), 255);
             int sepiaBlue = limit_value(round(0.272 * red + 0.534 * green + 0.131 * blue), 255);
@@ -57,10 +60,11 @@ void sepia(int height, int width, RGBTRIPLE image[height][width])
         }
 
     }
-    return;
 }
 
-void swap(RGBTRIPLE *pix1, RGBTRIPLE *pix2){
+// swap function to reflect image
+void swap(RGBTRIPLE *pix1, RGBTRIPLE *pix2)
+{
     RGBTRIPLE temp = *pix1;
     *pix1 = *pix2;
     *pix2 = temp;
@@ -72,16 +76,17 @@ void reflect(int height, int width, RGBTRIPLE image[height][width])
     int k = width - 1;
     for (int i = 0; i < height; i++)
     {
-        for (int j = 0; j < width/2; j++)
+        for (int j = 0; j < width / 2; j++)
         {
             swap(&image[i][j], &image[i][k - j]);
             //k--;
         }
     }
-    return;
 }
 
-bool IndexValidity(int i, int j, int height, int width){
+// check if index i, j is a valid pixel
+bool IndexValidity(int i, int j, int height, int width)
+{
     if (i >= 0 && i < height && j >= 0 && j < width)
     {
         return true;
@@ -97,9 +102,10 @@ bool IndexValidity(int i, int j, int height, int width){
 // Blur image
 void blur(int height, int width, RGBTRIPLE image[height][width])
 {
-	int totalRed, totalGreen, totalBlue;
-	float nrOfValids;
-	RGBTRIPLE blurImage[height][width];
+    int totalRed, totalGreen, totalBlue;
+    float nrOfValids;
+    // create temporary image
+    RGBTRIPLE blurImage[height][width];
 
     for (int i = 0; i < width; i++)
     {
@@ -124,7 +130,7 @@ void blur(int height, int width, RGBTRIPLE image[height][width])
                     {
                         continue;
                     }
-
+                    // calculate colour totals
                     totalRed += image[j + k][i + h].rgbtRed;
                     totalGreen += image[j + k][i + h].rgbtGreen;
                     totalBlue += image[j + k][i + h].rgbtBlue;
@@ -132,22 +138,21 @@ void blur(int height, int width, RGBTRIPLE image[height][width])
                 }
             }
 
-            // averages the sum to make picture look blurrier
+            // blur the image
             blurImage[j][i].rgbtRed = limit_value(round(totalRed / nrOfValids), 255);
             blurImage[j][i].rgbtGreen = limit_value(round(totalGreen / nrOfValids), 255);
             blurImage[j][i].rgbtBlue = limit_value(round(totalBlue / nrOfValids), 255);
         }
     }
 
+    // apply the blurring to original image
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
         {
             image[i][j].rgbtBlue = blurImage[i][j].rgbtBlue;
-			image[i][j].rgbtRed = blurImage[i][j].rgbtRed;
-			image[i][j].rgbtGreen = blurImage[i][j].rgbtGreen;
+            image[i][j].rgbtRed = blurImage[i][j].rgbtRed;
+            image[i][j].rgbtGreen = blurImage[i][j].rgbtGreen;
         }
     }
-
-    return;
 }

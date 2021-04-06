@@ -96,20 +96,24 @@ bool IndexValidity(int i, int j, int height, int width){
 // Blur image
 void blur(int height, int width, RGBTRIPLE image[height][width])
 {
-    int totalRed, totalGreen, totalBlue, nrOfValids = 0;
-    RGBTRIPLE blurImage[height][width];
+	int totalRed, totalGreen, totalBlue, nrOfValids = 0;
+	RGBTRIPLE blurImage[height][width];
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
         {
+			totalRed = 0;
+			totalBlue = 0;
+			totalGreen = 0;
+			nrOfValids = 0;
             // if valid location, add to total, incerement nr of totals
             int loci, locj = 0;
             for (int k = -1; k < 2; k++)
             {
                 for (int l = -1; l < 2; l++)
                 {
-                    locj = i + l;
-                    loci = j + k;
+                    loci = i + l;
+                    locj = j + k;
                     bool valid = IndexValidity(loci, locj, height, width);
                     if (valid == true)
                     {

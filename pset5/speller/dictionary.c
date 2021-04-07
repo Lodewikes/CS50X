@@ -30,31 +30,27 @@ int numWords;
 // Returns true if word is in dictionary, else false
 bool check(const char *word)
 {
-	// set up cursor
-	node *cursor = table[hash(word)];
+    // set up cursor
+    node *cursor = table[hash(word)];
 
-	// traverse list looking for word
-	while (cursor != NULL)
-	{
-		if (strcasecmp(cursor->word, word) == 0)
-		{
-			return true;
-		}
-		cursor = cursor->next;
-	}
+    // traverse list looking for word
+    while (cursor != NULL)
+    {
+        if (strcasecmp(cursor->word, word) == 0)
+        {
+            return true;
+        }
+        cursor = cursor->next;
+    }
     return false;
 }
 
 // Hashes word to a number
+// djb2 algorithm, found @ http://www.cse.yorku.ca/~oz/hash.html by Bernstein
 unsigned int hash(const char *word)
 {
 
-	// for each letter:
-	// int index;
-   	// index = (int) tolower(word[0] - 97);	
-    // return index;
-	
-	unsigned long hash = 5381;
+    unsigned long hash = 5381;
     int c;
 
     while ((c = tolower(*word++)))
@@ -67,41 +63,41 @@ unsigned int hash(const char *word)
 // Loads dictionary into memory, returning true if successful, else false
 bool load(const char *dictionary)
 {
-	// open dictionary file
-	FILE *file = fopen(dictionary, "r");
+    // open dictionary file
+    FILE *file = fopen(dictionary, "r");
 
-	// allocate memory for word
-	char word[LENGTH + 1];
+    // allocate memory for word
+    char word[LENGTH + 1];
 
-	if (file == NULL)
-	{
-		return false;
-	}
+    if (file == NULL)
+    {
+        return false;
+    }
 
-	// read file until EOF
-	while (fscanf(file, "%s", word) !=  EOF)
-	{
-		// allocate memory for a node
-		node *n = malloc(sizeof(node));
-		if (n == NULL)
-		{
-			return false;
-		}
-		// create new node for each word
-		strcpy(n->word, word);
+    // read file until EOF
+    while (fscanf(file, "%s", word) !=  EOF)
+    {
+        // allocate memory for a node
+        node *n = malloc(sizeof(node));
+        if (n == NULL)
+        {
+            return false;
+        }
+        // create new node for each word
+        strcpy(n->word, word);
 
-		// count words
-		numWords++;
+        // count words
+        numWords++;
 
-		// insert node into hashmap a that location
-		n->next = table[hash(word)];
+        // insert node into hashmap a that location
+        n->next = table[hash(word)];
 
-		// hash word to obtain hash value
-		table[hash(word)] = n;
+        // hash word to obtain hash value
+        table[hash(word)] = n;
 
-	}
-	
-	fclose(file);
+    }
+
+    fclose(file);
     return true;
 }
 
@@ -114,8 +110,8 @@ unsigned int size(void)
 // Unloads dictionary from memory, returning true if successful, else false
 bool unload(void)
 {
-	// create tmp, pointing to the same address as cursor
-	// free tmp after cursor has moved to the next pointer
+    // create tmp, pointing to the same address as cursor
+    // free tmp after cursor has moved to the next pointer
     node *tmp;
     node *cursor;
 

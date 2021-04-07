@@ -1,6 +1,12 @@
 // Implements a dictionary's functionality
 
 #include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <math.h>
+#include <ctype.h>
+
 
 #include "dictionary.h"
 
@@ -28,14 +34,32 @@ bool check(const char *word)
 // Hashes word to a number
 unsigned int hash(const char *word)
 {
+	/*
+	 * Used a polynomial hash function found at:
+	 * Sunlisavanur. (2012, August). Polynomial Hash Function for dictionary words [web]. retrieved from 
+	 * https://sunilsavanur.wordpress.com/2012/08/14/polynomial-hash-function-for-dictionary-words/
+	 * */
+
     // TODO
-    return 0;
+	// float index, sum = 0.0;
+
+	// for (int i = 0; j < strlen(word); i++)
+	// {
+	// 	sum += (int) word[j];
+	// 	index += (float)((int)word[i]) * 
+	// 	index += ((int)fmod(index, sum) * len) % (int) sizeof(table);
+	// }
+	
+
+	// for each letter:
+	int index;
+   	index = (int) tolower(word[0] - 97);	
+    return index;
 }
 
 // Loads dictionary into memory, returning true if successful, else false
 bool load(const char *dictionary)
 {
-    // TODO
 	// open dictionary file
 	FILE *file = fopen(dictionary, "r");
 
@@ -48,7 +72,7 @@ bool load(const char *dictionary)
 	}
 
 	// read file until EOF
-	while (fscanf(file, "%s", word) !+  EOF)
+	while (fscanf(file, "%s", word) !=  EOF)
 	{
 		// allocate memory for a node
 		node *n = malloc(sizeof(node));
@@ -59,15 +83,15 @@ bool load(const char *dictionary)
 		// create new node for each word
 		strcpy(n->word, word);
 
-		// TODO might have to swap next two lines
+		// insert node into hashmap a that location
+		n->next = table[hash(word)];
+
 		// hash word to obtain hash value
 		table[hash(word)] = n;
 
-		// insert node into hashmap a that location
-		n->next = table[hash(word)]
 	}
 	
-	fclose(file)	
+	fclose(file);
 	free(word);
     return true;
 }

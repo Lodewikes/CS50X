@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <ctype.h>
-
+#include <strings.h>
 
 #include "dictionary.h"
 
@@ -24,16 +24,38 @@ const unsigned int N = 1;
 // Hash table
 node *table[N];
 
+// word count
+int numWords;
+
 // Returns true if word is in dictionary, else false
 bool check(const char *word)
 {
-    // TODO
+	printf("check(\n)");
+	// set up cursor
+	node *cursor = table[hash(word)];
+
+	// compare
+	if (strcasecmp(cursor->word, word) == 0)
+	{
+		return true;
+	}
+
+	// traverse list looking for word
+	while (cursor->next != NULL)
+	{
+		cursor = cursor->next;
+		if (strcasecmp(cursor->word, word) == 0)
+		{
+			return true;
+		}
+	}
     return false;
 }
 
 // Hashes word to a number
 unsigned int hash(const char *word)
 {
+	printf("hash()\n");
 	/*
 	 * Used a polynomial hash function found at:
 	 * Sunlisavanur. (2012, August). Polynomial Hash Function for dictionary words [web]. retrieved from 
@@ -60,6 +82,7 @@ unsigned int hash(const char *word)
 // Loads dictionary into memory, returning true if successful, else false
 bool load(const char *dictionary)
 {
+	printf("load()\n");
 	// open dictionary file
 	FILE *file = fopen(dictionary, "r");
 
@@ -83,6 +106,9 @@ bool load(const char *dictionary)
 		// create new node for each word
 		strcpy(n->word, word);
 
+		// count words
+		numWords++;
+
 		// insert node into hashmap a that location
 		n->next = table[hash(word)];
 
@@ -99,13 +125,46 @@ bool load(const char *dictionary)
 // Returns number of words in dictionary if loaded, else 0 if not yet loaded
 unsigned int size(void)
 {
-    // TODO
-    return 0;
+	printf("size()\n");
+    return numWords;
 }
 
 // Unloads dictionary from memory, returning true if successful, else false
 bool unload(void)
 {
+	printf("unload()");
     // TODO
-    return false;
+	// create tmp, pointing to the same address as cursor
+	// free tmp after cursor has moved to the next pointer
+	node *tmp;
+	node *cursor;
+
+
+	for (int i = 0; i < N; i++)
+	{
+		if (table[i] == NULL)
+		{
+			continue;
+		}
+
+		cursor = table[i];
+		tmp = cursor;
+
+		// free each node in hashmap
+		while(cursor->next != NULL)
+		{
+			cursor = cursor->next;
+			free(tmp);
+			tmp = cursor;
+		}
+		free(cursor);
+	}
+
+    return true;
 }
+
+
+
+
+
+

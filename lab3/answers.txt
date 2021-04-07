@@ -1,0 +1,11 @@
+sort1 uses: Bubble sort
+
+How do you know?: similar time as the merge sort initially but increases with size.
+
+sort2 uses: Merge Sort
+
+How do you know?: Is the most efficient
+
+sort3 uses: Selection sort
+
+How do you know?: Always the same time. Size has no affect on the time.

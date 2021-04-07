@@ -71,7 +71,7 @@ bool load(const char *dictionary)
 	FILE *file = fopen(dictionary, "r");
 
 	// allocate memory for word
-	char *word = malloc(LENGTH);
+	char word[LENGTH + 1];
 
 	if (file == NULL)
 	{

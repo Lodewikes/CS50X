@@ -40,53 +40,52 @@ int main(void)
 person *create_family(int generations)
 {
     // Allocate memory for new person
-	person* pers = malloc(sizeof(person));
+    person *pers = malloc(sizeof(person));
 
     // Generation with parent data
     if (generations > 1)
     {
-        // TODO: Recursively create blood type histories for parents
-		pers -> parents[0] = create_family(generations - 1);
-		pers -> parents[1] = create_family(generations - 1);
-
-        // TODO: Randomly assign child alleles based on parents
-		int randomDad = rand() % 2;
-		int randomMom = rand() % 2;
-		pers -> alleles[0] = pers -> parents[0] -> alleles[randomDad];
-		pers -> alleles[1] = pers -> parents[1] -> alleles[randomMom];
+        // Recursively create blood type histories for parents
+        // Randomly assign child alleles based on parents
+        for (int i = 0; i <= 1; i++)
+        {
+            pers->parents[i] = create_family(generations - 1);
+            int random = rand() % 2;
+            pers->alleles[i] = pers->parents[i]->alleles[random];
+        }
     }
 
     // Generation without parent data
     else
     {
-        // TODO: Set parent pointers to NULL
-		pers -> parents[0] = NULL;
-		pers -> parents[1] = NULL;
-
-        // TODO: Randomly assign alleles
-		pers -> alleles[0] = random_allele();
-		pers -> alleles[1] = random_allele();
+        // Set parent pointers to NULL
+        // Randomly assign alleles
+        for (int i = 0; i <= 1; i++)
+        {
+            pers->parents[i] = NULL;
+            pers->alleles[i] = random_allele();
+        }
     }
 
-    // TODO: Return newly created person
+    // Return newly created person
     return pers;
 }
 
 // Free `p` and all ancestors of `p`.
 void free_family(person *p)
 {
-    // TODO: Handle base case
-	if (p == NULL)
-	{
-		return;
-	}
+    // Handle base case
+    if (p == NULL)
+    {
+        return;
+    }
 
-    // TODO: Free parents
-	free_family(p -> parents[0]);
-	free_family(p -> parents[1]);
+    // Free parents
+    free_family(p->parents[0]);
+    free_family(p->parents[1]);
 
-    // TODO: Free child
-	free(p);
+    // Free child
+    free(p);
 }
 
 // Print each family member and their alleles.

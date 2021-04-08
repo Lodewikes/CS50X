@@ -10,6 +10,54 @@
 
             // TODO: Add code to check answers to questions
 
+            function reset(classOrIdName, button) {
+                if (classOrIdName == ".butt") {
+                    var buttons = document.querySelectorAll(".butt");
+                    document.querySelector("#checkedP1").innerHTML = "";
+                    buttons.forEach(function(button) {
+                        button.style.backgroundColor = "#d9edff";
+                    });
+                }
+                else if (classOrIdName == "#subButt") {
+                    document.querySelector("#answer").style.backgroundColor = "#d9edff"
+                    document.querySelector("#checkedP1").innerHTML = "";
+                }
+            }
+
+            // lamda function
+            document.addEventListener("DOMContentLoaded", function() {
+                var buttons = document.querySelectorAll(".butt");
+                let correctChoice = "5";
+                buttons.forEach(function(button) {
+                    button.addEventListener("click", function() {
+                        reset(".butt");
+                        let choice = button.value;
+                        if (choice != correctChoice) {
+                            button.style.backgroundColor = "#ffb3b3";
+                            document.querySelector("#checkedP1").innerHTML = "Incorrect"
+                        }
+                        else {
+                            button.style.backgroundColor = "#b3ffb3";
+                            document.querySelector("#checkedP1").innerHTML = "Correct"
+                        }
+                    });
+                });
+
+                // for part2:
+                document.querySelector("#subButt").addEventListener("click", function() {
+                    reset("subButt")
+                    let answer = document.querySelector('#answer').value.toLowerCase();
+                    let correctAnswer = "switzerland";
+                    if (answer != correctAnswer) {
+                        document.querySelector('#answer').style.backgroundColor = "#ffb3b3";
+                        document.querySelector("#checkedP2").innerHTML = "Incorrect"
+                    }
+                    else {
+                        document.querySelector('#answer').style.backgroundColor = "#b3ffb3";
+                        document.querySelector("#checkedP2").innerHTML = "Correct"
+                    }
+                });
+            });
 
         </script>
 
@@ -27,19 +75,24 @@
                 <hr>
                 <!-- TODO: Add multiple choice question here -->
                 <h3>Some question</h3>
-                <button id="butt" type="button">SomeAnswer</button>
-                <button id="butt" type="button">SomeAnswer</button>
-                <button id="butt" type="button">SomeAnswer</button>
-                <button id="butt" type="button">SomeAnswer</button>
+                <h4 id="checkedP1"></h4>
+                <button class="butt" value="1" type="button">6 people per 1 sheep</button>
+                <button class="butt" value="2" type="button">3 people per 1 sheep</button>
+                <button class="butt" value="3" type="button">1 people per 1 sheep</button>
+                <button class="butt" value="4" type="button">1 people per 3 sheep</button>
+                <button class="butt" value="5" type="button">1 people per 6 sheep</button>
             </div>
 
             <div class="section">
                 <h2>Part 2: Free Response</h2>
                 <hr>
                 <!-- TODO: Add free response question here -->
-                <h3>Some question</h3>
-                <input type="text">
-                <button id="subButt" type="button">check answer</button>
+                <h3>In which country is it illegal to own only one guinea pig, as a lone guinea pig might get lonely?</h3>
+                <h4 id="checkedP2"></h4>
+                <form>
+                    <input id="answer" type="text" placeholder="Type answer" autocomplete="off" autofocus>
+                    <button id="subButt" type="button">check answer</button>
+                </form>
             </div>
 
         </div>

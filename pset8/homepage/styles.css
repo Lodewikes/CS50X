@@ -1,0 +1,49 @@
+body {
+    background-color: lightgrey;
+
+}
+.content-sport {
+    text-align: center;
+}
+
+.content-landing {
+    text-align: center;
+}
+
+.content-hobbies {
+    text-align: center;
+    color: black;
+}
+
+.content-prof {
+    text-align: center;
+}
+
+#col-dive-p {
+    text-align: center;
+}
+
+#beer {
+    height: 300px;
+    width: 400px;
+    margin-left: 300px;
+}
+
+#beach {
+    height: 300px;
+    width: 400px;
+    margin-left: 80px;
+    margin-top: 100px;
+}
+
+
+#read {
+    height: 300px;
+    width: 400px;
+    margin-left: 80px;
+    margin-top: 200px;
+}
+
+#question {
+    text-align: center;
+}

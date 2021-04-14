@@ -6,6 +6,7 @@ from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
+import datetime
 
 from helpers import apology, login_required, lookup, usd
 
@@ -55,15 +56,67 @@ def index():
 def buy():
     # TODO
     """Buy shares of stock"""
-    # request the symbol
-    # request the number of shares
-    # lookup() the symbol
-    # nr shares x price of share
-    # check if user has enough cash available
-    # allow purchase
-    # add tables (user_stocks)
-        # store stock_name, shares, value
-    return apology("TODO")
+    if request.method == "POST":
+        if not request.form.get("symbol"):
+            message = "You must select a valid share symbol."
+            return render_template("buy.html", message=message)
+
+        # lookup() the symbol
+        quote = lookup(request.form.get("symbol"))
+
+        if quote is None:
+            message = "You must select a valid share symbol."
+            id = "message"
+            return render_template("buy.html", message=message, id=id)
+        else:
+            # request the number of shares
+            shares = request.form.get("shares")
+            price = float(shares) * quote["price"]
+            # check if user has enough cash available
+            user_balance = db.execute("SELECT cash FROM users WHERE id=?", session.get("user_id"))[0]["cash"]
+            if price > user_balance:
+                message = "Insufficient Funds."
+                id = "insufficientMessage"
+                return render_template("buy.html", message=message, id=id)
+            elif price < user_balance:
+                user_balance -= price
+                timestamp = str(datetime.datetime.now())
+                # insert name, name_pk, symbol, shares into shares
+                existSymbol = db.execute("SELECT symbol FROM shares WHERE symbol=?", quote["symbol"])
+                username = db.execute("SELECT username FROM users WHERE id=?", session.get("user_id"))[0]["username"]
+                print(username)
+
+                if existSymbol:
+                    if existSymbol[0]["symbol"] == quote["symbol"]:
+                        current_shares = db.execute("SELECT shares.shares FROM shares WHERE shares.symbol=?",
+                                                    quote["symbol"])[0]["shares"]
+                        new_shares = current_shares + int(shares)
+                        db.execute("UPDATE shares SET shares=? WHERE symbol=?", new_shares, quote["symbol"])
+                elif not existSymbol:
+                    print(existSymbol)
+                    print(quote["symbol"])
+                    db.execute("INSERT INTO shares (user, user_pk, symbol, shares) VALUES(?, ?, ?, ?)",
+                               username,
+                               session.get("user_id"),
+                               quote["symbol"],
+                               shares
+                               )
+
+                # TODO insert name, name_pk, date, time, symbol, +-shares, price/share into history
+                db.execute("INSERT INTO history (user, user_pk, timestamp, symbol, delta_shares, price_share)"
+                           " VALUES(?, ?, ?, ?, ?, ?)",
+                           username,
+                           session.get("user_id"),
+                           timestamp,
+                           quote["symbol"],
+                           shares,
+                           quote["price"]
+                           )
+                # insert new cash balance into user
+                db.execute("UPDATE users SET cash=? WHERE id=?", user_balance, session.get("user_id"))
+            return redirect("/")
+        # git commit
+    return render_template("buy.html")
 
 
 @app.route("/history")
@@ -71,7 +124,7 @@ def buy():
 def history():
     # TODO
     """Show history of transactions"""
-    return apology("TODO")
+    return render_template("history.html")
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -184,7 +237,59 @@ def register():
 @login_required
 def sell():
     """Sell shares of stock"""
-    return apology("TODO")
+    if request.method == "POST":
+        if not request.form.get("symbol"):
+            message = "You must select a valid share symbol."
+            return render_template("sell.html", message=message)
+
+        # lookup() the symbol
+        quote = lookup(request.form.get("symbol"))
+
+        if quote is None:
+            message = "You must select a valid share symbol."
+            id = "message"
+            return render_template("sell.html", message=message, id=id)
+        else:
+            # request the number of shares
+            shares = request.form.get("shares")
+            price = float(shares) * quote["price"]
+            # check if user has enough cash available
+            user_balance = db.execute("SELECT cash FROM users WHERE id=?", session.get("user_id"))[0]["cash"]
+            user_balance += price
+            timestamp = str(datetime.datetime.now())
+            # insert name, name_pk, symbol, shares into shares
+            existSymbol = db.execute("SELECT symbol FROM shares WHERE symbol=?", quote["symbol"])
+            username = db.execute("SELECT username FROM users WHERE id=?", session.get("user_id"))[0]["username"]
+            print(username)
+
+            if existSymbol:
+                if existSymbol[0]["symbol"] == quote["symbol"]:
+                    current_shares = db.execute("SELECT shares.shares FROM shares WHERE shares.symbol=?",
+                                                quote["symbol"])[0]["shares"]
+                    if int(shares) > current_shares:
+                        message = "You only have {} shares to sell".format(current_shares)
+                        return render_template("sell.html", message=message)
+                    new_shares = current_shares - int(shares)
+                    db.execute("UPDATE shares SET shares=? WHERE symbol=?", new_shares, quote["symbol"])
+            else:
+                message = "you do not have {} shares to sell.".format(quote["symbol"])
+                return render_template("sell.html", message=message)
+
+            # TODO insert name, name_pk, date, time, symbol, +-shares, price/share into history
+            db.execute("INSERT INTO history (user, user_pk, timestamp, symbol, delta_shares, price_share)"
+                       " VALUES(?, ?, ?, ?, ?, ?)",
+                       username,
+                       session.get("user_id"),
+                       timestamp,
+                       quote["symbol"],
+                       int(shares) * (-1),
+                       quote["price"]
+                       )
+            # insert new cash balance into user
+            db.execute("UPDATE users SET cash=? WHERE id=?", user_balance, session.get("user_id"))
+        return redirect("/")
+        # git commit
+    return render_template("sell.html")
 
 
 def errorhandler(e):

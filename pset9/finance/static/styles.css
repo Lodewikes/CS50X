@@ -46,12 +46,12 @@ main img
     max-width: 100%;
 }
 
-#register-message {
+#message {
     color: #999999;
+    margin-top: 15px;
 }
 
-
-#quote-message {
-    color: #999999;
+#insufficientMessage {
+    color:  #ff4d4d;
     margin-top: 15px;
 }

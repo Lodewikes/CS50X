@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block main %}
+    <form action="/" method="get">
+    <div class="table-hover">
+        <table class="table">
+            <thead>
+                <td scope="col">Symbol</td>
+                <td scope="col">Name</td>
+                <td scope="col">Shares</td>
+                <td scope="col">Price</td>
+                <td scope="col">Total</td>
+            </thead>
+            <tbody>
+                {% for shar in shares %}
+                <tr>
+                        <td>{{ shar.symbol }}</td>
+                        <td>TODO:Fullname</td>
+                        <td>{{ shar.shares }}</td>
+                        <td>TODO:Price</td>
+                        <td>{{ 2 * 4 }}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td>CASH</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>${{ cash }}</td>
+
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    </form>
+    <hr>
+{% endblock %}

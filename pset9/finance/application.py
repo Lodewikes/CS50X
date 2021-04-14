@@ -48,7 +48,9 @@ if not os.environ.get("API_KEY"):
 def index():
     # TODO
     """Show portfolio of stocks"""
-    return apology("TODO")
+    cash = round(db.execute("SELECT cash FROM users WHERE id=?", session.get("user_id"))[0]["cash"], 2)
+    shares = db.execute("SELECT symbol, shares FROM shares WHERE user_pk=?", session.get("user_id"))
+    return render_template("index.html", cash=cash, shares=shares)
 
 
 @app.route("/buy", methods=["GET", "POST"])
@@ -124,7 +126,8 @@ def buy():
 def history():
     # TODO
     """Show history of transactions"""
-    return render_template("history.html")
+    transactions = db.execute("SELECT * FROM history")
+    return render_template("history.html", trans=transactions)
 
 
 @app.route("/login", methods=["GET", "POST"])

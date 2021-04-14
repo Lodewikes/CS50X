@@ -5,13 +5,27 @@
 {% endblock %}
 
 {% block main %}
-    <table>
-        <thead>
-            <td>Symbol</td>
-            <td>Shares</td>
-            <td>Price</td>
-            <td>Transacted</td>
-        </thead>
-    </table>
+    <form action="/history" method="get">
+    <div class="table-hover">
+        <table class="table">
+            <thead>
+                <td scope="col">Symbol</td>
+                <td scope="col">Shares</td>
+                <td scope="col">Price</td>
+                <td scope="col">Transacted</td>
+            </thead>
+            <tbody>
+                {% for tran in trans %}
+                <tr>
+                        <td>{{ tran.symbol }}</td>
+                        <td>{{ tran.delta_shares }}</td>
+                        <td>{{ tran.price_share }}</td>
+                        <td>{{ tran.timestamp }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </form>
     <hr>
 {% endblock %}

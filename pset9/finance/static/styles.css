@@ -47,5 +47,11 @@ main img
 }
 
 #register-message {
-    color: #999999
+    color: #999999;
+}
+
+
+#quote-message {
+    color: #999999;
+    margin-top: 15px;
 }

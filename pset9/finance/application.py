@@ -55,6 +55,14 @@ def index():
 def buy():
     # TODO
     """Buy shares of stock"""
+    # request the symbol
+    # request the number of shares
+    # lookup() the symbol
+    # nr shares x price of share
+    # check if user has enough cash available
+    # allow purchase
+    # add tables (user_stocks)
+        # store stock_name, shares, value
     return apology("TODO")
 
 
@@ -116,10 +124,18 @@ def logout():
 @app.route("/quote", methods=["GET", "POST"])
 @login_required
 def quote():
-    # TODO
+    # TODO add a graph perhaps
     """Get stock quote."""
-    return render_template("quote.html")
-    # return apology("TODO")
+    if request.method == "POST":
+        symbol = request.form.get("symbol")
+        quote = lookup(symbol)
+        if quote is None:
+            message = "No such stock available."
+            return render_template("quote.html", message=message)
+        else:
+            return render_template("quoted.html", message="", quote=quote)
+    else:
+        return render_template("quote.html")
 
 
 @app.route("/register", methods=["GET", "POST"])

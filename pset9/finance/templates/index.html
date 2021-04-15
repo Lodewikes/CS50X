@@ -17,13 +17,12 @@
             </thead>
             <tbody>
                 {% for shar in shares %}
-                    {% set value = shar["shares"] * shar["price"] %}
                 <tr>
                         <td>{{ shar.symbol }}</td>
                         <td>{{ shar.name }}</td>
                         <td>{{ shar.shares }}</td>
-                        <td>{{ shar["price"] | usd }}</td>
-                        <td>{{ value | usd }}</td>
+                        <td>{{ shar.price | usd }}</td>
+                        <td>{{ shar.value | usd }}</td>
                 </tr>
                 {% endfor %}
                 <tr>
@@ -34,12 +33,11 @@
                     <td>{{ cash | usd }}</td>
                 </tr>
                 <tr>
-                    {% set total = cash + shares_val %}
                     <td></td>
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td>{{ total | usd }}</td>
+                    <td>{{ shares_val | usd }}</td>
                 </tr>
             </tbody>
         </table>

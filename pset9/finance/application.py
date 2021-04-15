@@ -50,13 +50,14 @@ def index():
     """Show portfolio of stocks"""
     cash = db.execute("SELECT cash FROM users WHERE id=?", session.get("user_id"))[0]["cash"]
     shares = db.execute("SELECT symbol, name, shares FROM shares WHERE user_pk=? AND shares!=0", session.get("user_id"))
-    total_share_value = 0
+    total_share_value = cash
     for share in shares:
         x = lookup(share["symbol"])
         share["price"] = x["price"]
+        share["value"] = share["shares"] * share["price"]
         print(share)
         total_share_value = total_share_value + (share["price"] * share["shares"])
-    return render_template("index.html", cash=cash, shares=shares, shares_val=total_share_value)
+    return render_template("index.html", cash=round(cash, 2), shares=shares, shares_val=round(total_share_value, 2))
 
 
 @app.route("/buy", methods=["GET", "POST"])
@@ -79,11 +80,12 @@ def buy():
             return render_template("buy.html", message=message, id=id), 400
         else:
             # request the number of shares
-            shares = request.form.get("shares")
-            if not isinstance(shares, (int)) or shares < 0:
-                message = "invalid number of shares selected"
+            shares = int(request.form.get("shares"))
+            if not share.is_interger() or shares <= 0:
+                message="Not a valid number of shares"
                 id = "message"
                 return render_template("buy.html", id=id, message=message), 400
+
             price = float(shares) * quote["price"]
             # check if user has enough cash available
             user_balance = db.execute("SELECT cash FROM users WHERE id=?", session.get("user_id"))[0]["cash"]
@@ -99,7 +101,6 @@ def buy():
                                          quote["symbol"],
                                          session.get("user_id"))
                 username = db.execute("SELECT username FROM users WHERE id=?", session.get("user_id"))[0]["username"]
-                print(username)
 
                 if existSymbol:
                     if existSymbol[0]["symbol"] == quote["symbol"]:

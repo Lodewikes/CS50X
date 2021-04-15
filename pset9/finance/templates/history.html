@@ -19,7 +19,7 @@
                 <tr>
                         <td>{{ tran.symbol }}</td>
                         <td>{{ tran.delta_shares }}</td>
-                        <td>${{ tran.price_share }}</td>
+                        <td>{{ tran.price_share | usd }}</td>
                         <td>{{ tran.timestamp }}</td>
                 </tr>
                 {% endfor %}

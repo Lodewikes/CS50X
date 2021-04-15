@@ -233,7 +233,7 @@ def register():
                 message = "Please supply a password."
                 return render_template("register.html", message=message)
             # check if entered a matching confirmation password
-            if request.form.get("password") != request.form.get("password-confirm"):
+            if request.form.get("password") != request.form.get("confirmation"):
                 message = "Passwords must match."
                 return render_template("register.html", message=message)
             password_hash = generate_password_hash(request.form.get("password"))

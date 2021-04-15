@@ -313,10 +313,29 @@ def sell():
         # git commit
     return render_template("sell.html")
 
-@app.route("/quote", methods=["GET", "POST"])
+
+@app.route("/account", methods=["GET", "POST"])
 @login_required
 def account():
-    return render_template("account.html")
+    cash = db.execute("SELECT cash FROM users WHERE id=?", session.get("user_id"))
+    if request.method == "POST":
+        addition = request.form.get("cash")
+        new_balance = round((cash[0]["cash"] + float(addition)), 2)
+        username = db.execute("SELECT username FROM users WHERE id=?", session.get("user_id"))[0]["username"]
+        timestamp = str(datetime.datetime.now())
+        db.execute("UPDATE users SET cash=? WHERE id=?", new_balance, session.get("user_id"))
+        db.execute("INSERT INTO history (user, user_pk, timestamp, symbol, delta_shares, price_share)"
+                   " VALUES(?, ?, ?, ?, ?, ?)",
+                   username,
+                   session.get("user_id"),
+                   timestamp,
+                   "Cash Deposit",
+                   0,
+                   addition
+                   )
+        return redirect("/")
+    return render_template("account.html", cash=cash[0]["cash"])
+
 
 def errorhandler(e):
     """Handle error"""

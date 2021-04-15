@@ -80,9 +80,14 @@ def buy():
             return render_template("buy.html", message=message, id=id), 400
         else:
             # request the number of shares
-            shares = int(request.form.get("shares"))
-            if not share.is_interger() or shares <= 0:
-                message="Not a valid number of shares"
+            try:
+                shares = int(request.form.get("shares"))
+            except:
+                message = "Please enter an integer value."
+                id = "message"
+                return render_template("buy.html", id=id, message=message), 400
+            if shares <= 0:
+                message = "Not a valid number of shares"
                 id = "message"
                 return render_template("buy.html", id=id, message=message), 400
 
@@ -203,7 +208,7 @@ def quote():
     """Get stock quote."""
     if request.method == "POST":
         if not request.form.get("symbol"):
-            message="please enter a symbol"
+            message = "please enter a symbol"
             return render_template("quote.html", message=message), 400
         symbol = request.form.get("symbol")
         quote = lookup(symbol)

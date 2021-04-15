@@ -67,7 +67,8 @@ def buy():
     if request.method == "POST":
         if not request.form.get("symbol"):
             message = "You must select a valid share symbol."
-            return render_template("buy.html", message=message)
+            id = "message"
+            return render_template("buy.html", message=message, id=id)
 
         # lookup() the symbol
         quote = lookup(request.form.get("symbol"))
@@ -131,7 +132,7 @@ def buy():
                 db.execute("UPDATE users SET cash=? WHERE id=?", user_balance, session.get("user_id"))
             return redirect("/")
         # git commit
-    return render_template("buy.html")
+    return render_template("buy.html", id="message")
 
 
 @app.route("/history")
@@ -252,11 +253,14 @@ def register():
 @app.route("/sell", methods=["GET", "POST"])
 @login_required
 def sell():
+
     """Sell shares of stock"""
+    id = "message"
+    available_shares = db.execute("SELECT symbol FROM shares WHERE user_pk=? AND shares!=0", session.get("user_id"))
     if request.method == "POST":
         if not request.form.get("symbol"):
             message = "You must select a valid share symbol."
-            return render_template("sell.html", message=message)
+            return render_template("sell.html", message=message, id=id)
 
         # lookup() the symbol
         quote = lookup(request.form.get("symbol"))
@@ -286,7 +290,7 @@ def sell():
                                                 quote["symbol"], session.get("user_id"))[0]["shares"]
                     if int(shares) > current_shares:
                         message = "You only have {} shares to sell".format(current_shares)
-                        return render_template("sell.html", message=message)
+                        return render_template("sell.html", message=message, id=id)
                     new_shares = current_shares - int(shares)
                     db.execute("UPDATE shares SET shares=? WHERE symbol=? AND user_pk=? ",
                                new_shares,
@@ -295,7 +299,7 @@ def sell():
                                )
             else:
                 message = "you do not have {} shares to sell.".format(quote["symbol"])
-                return render_template("sell.html", message=message)
+                return render_template("sell.html", message=message, id=id)
 
             # TODO insert name, name_pk, date, time, symbol, +-shares, price/share into history
             db.execute("INSERT INTO history (user, user_pk, timestamp, symbol, delta_shares, price_share)"
@@ -311,7 +315,7 @@ def sell():
             db.execute("UPDATE users SET cash=? WHERE id=?", user_balance, session.get("user_id"))
         return redirect("/")
         # git commit
-    return render_template("sell.html")
+    return render_template("sell.html", shares=available_shares, id=id)
 
 
 @app.route("/account", methods=["GET", "POST"])

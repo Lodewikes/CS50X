@@ -285,11 +285,17 @@ def sell():
             return render_template("sell.html", message=message, id=id), 400
         else:
             # request the number of shares
-            shares = request.form.get("shares")
-            if not isinstance(shares, (int)) or shares < 0:
-                message = "invalid number of shares selected"
+            try:
+                shares = int(request.form.get("shares"))
+            except:
+                message = "Please enter an integer value."
                 id = "message"
                 return render_template("sell.html", id=id, message=message), 400
+            if shares <= 0:
+                message = "Not a valid number of shares"
+                id = "message"
+                return render_template("sell.html", id=id, message=message), 400
+
             price = float(shares) * quote["price"]
             # check if user has enough cash available
             user_balance = db.execute("SELECT cash FROM users WHERE id=?", session.get("user_id"))[0]["cash"]
@@ -308,7 +314,7 @@ def sell():
                                                 quote["symbol"], session.get("user_id"))[0]["shares"]
                     if int(shares) > current_shares:
                         message = "You only have {} shares to sell".format(current_shares)
-                        return render_template("sell.html", message=message, id=id)
+                        return render_template("sell.html", message=message, id=id), 400
                     new_shares = current_shares - int(shares)
                     db.execute("UPDATE shares SET shares=? WHERE symbol=? AND user_pk=? ",
                                new_shares,
@@ -317,7 +323,7 @@ def sell():
                                )
             else:
                 message = "you do not have {} shares to sell.".format(quote["symbol"])
-                return render_template("sell.html", message=message, id=id)
+                return render_template("sell.html", message=message, id=id), 400
 
             # TODO insert name, name_pk, date, time, symbol, +-shares, price/share into history
             db.execute("INSERT INTO history (user, user_pk, timestamp, symbol, delta_shares, price_share)"

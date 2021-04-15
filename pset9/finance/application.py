@@ -49,8 +49,14 @@ def index():
     # TODO
     """Show portfolio of stocks"""
     cash = round(db.execute("SELECT cash FROM users WHERE id=?", session.get("user_id"))[0]["cash"], 2)
-    shares = db.execute("SELECT symbol, shares FROM shares WHERE user_pk=?", session.get("user_id"))
-    return render_template("index.html", cash=cash, shares=shares)
+    shares = db.execute("SELECT symbol, name, shares FROM shares WHERE user_pk=? AND shares!=0", session.get("user_id"))
+    total_share_value = 0
+    for share in shares:
+        x = lookup(share["symbol"])
+        share["price"] = x["price"]
+        print(share)
+        total_share_value = round(total_share_value + (share["price"] * share["shares"]), 2)
+    return render_template("index.html", cash=cash, shares=shares, shares_val=total_share_value)
 
 
 @app.route("/buy", methods=["GET", "POST"])
@@ -84,7 +90,9 @@ def buy():
                 user_balance -= price
                 timestamp = str(datetime.datetime.now())
                 # insert name, name_pk, symbol, shares into shares
-                existSymbol = db.execute("SELECT symbol FROM shares WHERE symbol=?", quote["symbol"])
+                existSymbol = db.execute("SELECT symbol FROM shares WHERE symbol=? AND user_pk=?",
+                                         quote["symbol"],
+                                         session.get("user_id"))
                 username = db.execute("SELECT username FROM users WHERE id=?", session.get("user_id"))[0]["username"]
                 print(username)
 
@@ -93,14 +101,19 @@ def buy():
                         current_shares = db.execute("SELECT shares.shares FROM shares WHERE shares.symbol=?",
                                                     quote["symbol"])[0]["shares"]
                         new_shares = current_shares + int(shares)
-                        db.execute("UPDATE shares SET shares=? WHERE symbol=?", new_shares, quote["symbol"])
+                        db.execute("UPDATE shares SET shares=? WHERE symbol=? AND user_pk=?",
+                                   new_shares,
+                                   quote["symbol"],
+                                   session.get("user_id")
+                                   )
                 elif not existSymbol:
                     print(existSymbol)
                     print(quote["symbol"])
-                    db.execute("INSERT INTO shares (user, user_pk, symbol, shares) VALUES(?, ?, ?, ?)",
+                    db.execute("INSERT INTO shares (user, user_pk, symbol, name, shares) VALUES(?, ?, ?, ?, ?)",
                                username,
                                session.get("user_id"),
                                quote["symbol"],
+                               quote["name"],
                                shares
                                )
 
@@ -126,7 +139,7 @@ def buy():
 def history():
     # TODO
     """Show history of transactions"""
-    transactions = db.execute("SELECT * FROM history")
+    transactions = db.execute("SELECT * FROM history WHERE user_pk=?", session.get("user_id"))
     return render_template("history.html", trans=transactions)
 
 
@@ -208,7 +221,7 @@ def register():
             return render_template("register.html", message=message)
         # check if already existing username
         db_name = db.execute("SELECT users.username FROM users WHERE users.username='" +
-                                   request.form.get("username") + "'")
+                             request.form.get("username") + "'")
         if db_name:
             if db_name[0]["username"] == request.form.get("username"):
                 message = "Username exists already."
@@ -261,19 +274,25 @@ def sell():
             user_balance += price
             timestamp = str(datetime.datetime.now())
             # insert name, name_pk, symbol, shares into shares
-            existSymbol = db.execute("SELECT symbol FROM shares WHERE symbol=?", quote["symbol"])
+            existSymbol = db.execute("SELECT symbol FROM shares WHERE symbol=? AND user_pk=?",
+                                     quote["symbol"],
+                                     session.get("user_id"))
             username = db.execute("SELECT username FROM users WHERE id=?", session.get("user_id"))[0]["username"]
             print(username)
 
             if existSymbol:
                 if existSymbol[0]["symbol"] == quote["symbol"]:
-                    current_shares = db.execute("SELECT shares.shares FROM shares WHERE shares.symbol=?",
-                                                quote["symbol"])[0]["shares"]
+                    current_shares = db.execute("SELECT shares.shares FROM shares WHERE shares.symbol=? AND user_pk=?",
+                                                quote["symbol"], session.get("user_id"))[0]["shares"]
                     if int(shares) > current_shares:
                         message = "You only have {} shares to sell".format(current_shares)
                         return render_template("sell.html", message=message)
                     new_shares = current_shares - int(shares)
-                    db.execute("UPDATE shares SET shares=? WHERE symbol=?", new_shares, quote["symbol"])
+                    db.execute("UPDATE shares SET shares=? WHERE symbol=? AND user_pk=? ",
+                               new_shares,
+                               quote["symbol"],
+                               session.get("user_id")
+                               )
             else:
                 message = "you do not have {} shares to sell.".format(quote["symbol"])
                 return render_template("sell.html", message=message)
@@ -294,6 +313,10 @@ def sell():
         # git commit
     return render_template("sell.html")
 
+@app.route("/quote", methods=["GET", "POST"])
+@login_required
+def account():
+    return render_template("account.html")
 
 def errorhandler(e):
     """Handle error"""

@@ -19,10 +19,10 @@
                 {% for shar in shares %}
                 <tr>
                         <td>{{ shar.symbol }}</td>
-                        <td>TODO:Fullname</td>
+                        <td>{{ shar.name }}</td>
                         <td>{{ shar.shares }}</td>
-                        <td>TODO:Price</td>
-                        <td>{{ 2 * 4 }}</td>
+                        <td>${{ shar.price }}</td>
+                        <td>${{ "%.2f" |format(shar.price * shar.shares)}}</td>
                 </tr>
                 {% endfor %}
                 <tr>
@@ -32,6 +32,13 @@
                     <td></td>
                     <td>${{ cash }}</td>
 
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>${{ cash +  shares_val}}</td>
                 </tr>
             </tbody>
         </table>

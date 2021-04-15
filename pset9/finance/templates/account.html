@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block main %}
+    <form action="/buy" method="post">
+        <div class="form-group">
+            <input id="buy-symbol" autocomplete="off" autofocus
+                   class="form-control" name="symbol" placeholder="Symbol" type="text">
+        </div>
+        <div class="form-group">
+            <input id="buy-number" autocomplete="off" class="form-control"
+                   name="shares" placeholder="Shares" type="number" min="0">
+        </div>
+        <button id="symbol-button" class="btn btn-primary" type="submit">Buy</button>
+    </form>
+    <hr>
+    <h4 id="{{ id }}">{{ message }}</h4>
+{% endblock %}>

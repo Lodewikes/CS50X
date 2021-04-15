@@ -5,6 +5,6 @@
 {% endblock %}
 
 {% block main %}
-    <h4>A share of {{ quote["name"] }} ({{ quote["symbol"] }}) costs ${{ quote["price"] }}</h4>
+    <h4>A share of {{ quote["name"] }} ({{ quote["symbol"] }}) costs {{ quote["price"] | usd }}</h4>
     <hr>
 {% endblock %}

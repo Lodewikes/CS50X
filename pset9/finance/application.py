@@ -48,14 +48,14 @@ if not os.environ.get("API_KEY"):
 def index():
     # TODO
     """Show portfolio of stocks"""
-    cash = round(db.execute("SELECT cash FROM users WHERE id=?", session.get("user_id"))[0]["cash"], 2)
+    cash = db.execute("SELECT cash FROM users WHERE id=?", session.get("user_id"))[0]["cash"]
     shares = db.execute("SELECT symbol, name, shares FROM shares WHERE user_pk=? AND shares!=0", session.get("user_id"))
     total_share_value = 0
     for share in shares:
         x = lookup(share["symbol"])
         share["price"] = x["price"]
         print(share)
-        total_share_value = round(total_share_value + (share["price"] * share["shares"]), 2)
+        total_share_value = total_share_value + (share["price"] * share["shares"])
     return render_template("index.html", cash=cash, shares=shares, shares_val=total_share_value)
 
 
@@ -68,7 +68,7 @@ def buy():
         if not request.form.get("symbol"):
             message = "You must select a valid share symbol."
             id = "message"
-            return render_template("buy.html", message=message, id=id)
+            return render_template("buy.html", message=message, id=id), 400
 
         # lookup() the symbol
         quote = lookup(request.form.get("symbol"))
@@ -76,17 +76,21 @@ def buy():
         if quote is None:
             message = "You must select a valid share symbol."
             id = "message"
-            return render_template("buy.html", message=message, id=id)
+            return render_template("buy.html", message=message, id=id), 400
         else:
             # request the number of shares
             shares = request.form.get("shares")
+            if not isinstance(shares, (int)) or shares < 0:
+                message = "invalid number of shares selected"
+                id = "message"
+                return render_template("buy.html", id=id, message=message), 400
             price = float(shares) * quote["price"]
             # check if user has enough cash available
             user_balance = db.execute("SELECT cash FROM users WHERE id=?", session.get("user_id"))[0]["cash"]
             if price > user_balance:
                 message = "Insufficient Funds."
                 id = "insufficientMessage"
-                return render_template("buy.html", message=message, id=id)
+                return render_template("buy.html", message=message, id=id), 400
             elif price < user_balance:
                 user_balance -= price
                 timestamp = str(datetime.datetime.now())
@@ -197,11 +201,14 @@ def quote():
     # TODO add a graph perhaps
     """Get stock quote."""
     if request.method == "POST":
+        if not request.form.get("symbol"):
+            message="please enter a symbol"
+            return render_template("quote.html", message=message), 400
         symbol = request.form.get("symbol")
         quote = lookup(symbol)
         if quote is None:
             message = "No such stock available."
-            return render_template("quote.html", message=message)
+            return render_template("quote.html", message=message), 400
         else:
             return render_template("quoted.html", message="", quote=quote)
     else:
@@ -226,7 +233,7 @@ def register():
         if db_name:
             if db_name[0]["username"] == request.form.get("username"):
                 message = "Username exists already."
-                return render_template("register.html", message=message), 200
+                return render_template("register.html", message=message), 400
         elif not db_name:
             # check if entered a password
             if not request.form.get("password"):
@@ -261,7 +268,7 @@ def sell():
     if request.method == "POST":
         if not request.form.get("symbol"):
             message = "You must select a valid share symbol."
-            return render_template("sell.html", message=message, id=id)
+            return render_template("sell.html", message=message, id=id), 400
 
         # lookup() the symbol
         quote = lookup(request.form.get("symbol"))
@@ -269,10 +276,14 @@ def sell():
         if quote is None:
             message = "You must select a valid share symbol."
             id = "message"
-            return render_template("sell.html", message=message, id=id)
+            return render_template("sell.html", message=message, id=id), 400
         else:
             # request the number of shares
             shares = request.form.get("shares")
+            if not isinstance(shares, (int)) or shares < 0:
+                message = "invalid number of shares selected"
+                id = "message"
+                return render_template("sell.html", id=id, message=message), 400
             price = float(shares) * quote["price"]
             # check if user has enough cash available
             user_balance = db.execute("SELECT cash FROM users WHERE id=?", session.get("user_id"))[0]["cash"]

@@ -215,27 +215,27 @@ def register():
         # check if entered a username and password
         if not request.form.get("username") and not request.form.get("password"):
             message = "please supply a username and a password."
-            return render_template("register.html", message=message)
+            return render_template("register.html", message=message), 400
         # check if entered a username
         if not request.form.get("username"):
             message = "Please supply a username."
-            return render_template("register.html", message=message)
+            return render_template("register.html", message=message), 400
         # check if already existing username
         db_name = db.execute("SELECT users.username FROM users WHERE users.username='" +
                              request.form.get("username") + "'")
         if db_name:
             if db_name[0]["username"] == request.form.get("username"):
                 message = "Username exists already."
-                return render_template("register.html", message=message)
+                return render_template("register.html", message=message), 200
         elif not db_name:
             # check if entered a password
             if not request.form.get("password"):
                 message = "Please supply a password."
-                return render_template("register.html", message=message)
+                return render_template("register.html", message=message), 400
             # check if entered a matching confirmation password
             if request.form.get("password") != request.form.get("confirmation"):
                 message = "Passwords must match."
-                return render_template("register.html", message=message)
+                return render_template("register.html", message=message), 400
             password_hash = generate_password_hash(request.form.get("password"))
             query = 'INSERT INTO users (username, hash, cash) VALUES("{}", "{}", {})'.format(
                 request.form.get("username"),
@@ -243,6 +243,8 @@ def register():
                 10000.00
             )
             db.execute(query)
+            person = db.execute("SELECT * FROM users WHERE username=?", request.form.get("username"))
+            session["user_id"] = person[0]["id"]
             return redirect("/")
     else:
         message = ""
@@ -253,7 +255,6 @@ def register():
 @app.route("/sell", methods=["GET", "POST"])
 @login_required
 def sell():
-
     """Sell shares of stock"""
     id = "message"
     available_shares = db.execute("SELECT symbol FROM shares WHERE user_pk=? AND shares!=0", session.get("user_id"))

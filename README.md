@@ -1,4 +1,4 @@
-CS50 problem sets and labs: https://cs50.harvard.edu/x/2021/\
+CS50 problem sets and labs: https://cs50.harvard.edu/x/2021/ \
 Contents as per my submissions:
 * [labs](labs/)
   * [lab 1 - hello](labs/lab1/hello/hello.c)

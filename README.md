@@ -38,3 +38,4 @@ Contents as per my submissions:
   * [pset 9 - finance](/problemSets/pset9/finance/)
 * [Final Project](https://github.com/Lodewikes/vGhostingAndroid.git)
 
+![](cs50.png)
